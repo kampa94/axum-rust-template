@@ -19,12 +19,12 @@ async fn main() {
         .max_connections(5)
         .connect(&config.database_url)
         .await
-        .expect("connessione al DB fallita");
+        .expect("connection to DB failed");
 
     sqlx::migrate!()
         .run(&pool)
         .await
-        .expect("migrazioni fallite");
+        .expect("migrations failed");
     tracing::info!("database connected and migrations applied");
 
     let user_service = UserService::new(UserRepository::new(pool.clone()));
