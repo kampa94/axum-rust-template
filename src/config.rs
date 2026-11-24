@@ -1,5 +1,6 @@
 use std::env;
 use std::net::IpAddr;
+use tracing::error;
 
 #[derive(Clone)]
 pub struct Config {
@@ -19,7 +20,11 @@ impl Config {
                 .ok()
                 .and_then(|p| p.parse().ok())
                 .unwrap_or(3000),
-            database_url: env::var("DATABASE_URL").unwrap_or_default(),
+            database_url: env::var("DATABASE_URL")
+                .unwrap_or_else(|e| {
+                    error!("error retrieving database URL: {e}");
+                    panic!("failed to retrieve database URL");
+                }),
         }
     }
 }
