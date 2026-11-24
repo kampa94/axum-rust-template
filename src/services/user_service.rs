@@ -3,6 +3,7 @@ use crate::{
     error::AppError,
     repository::user_repository::UserRepository,
 };
+use sqlx::Error;
 use tracing::{error, info, warn};
 
 #[derive(Clone)]
@@ -40,7 +41,17 @@ impl UserService {
             .insert(req.name, req.email)
             .await
             .map_err(|e| {
-                error!("error creating user email={}: {e}", email);
+                let is_dup = matches!(
+                    &e,
+                    Error::Database(db_err) if db_err
+                        .code()
+                        .map_or(false, |code| code == "23505")
+                );
+                if is_dup {
+                    warn!("duplicate email: {}", email);
+                    return AppError::Conflict("email already exists".into());
+                }
+                error!("error creating user email={}: {}", email, e);
                 AppError::Internal
             })?;
         info!("user created id={} email={}", user.id, user.email);

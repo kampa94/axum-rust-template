@@ -6,6 +6,7 @@ use tracing::error;
 pub enum AppError {
     NotFound,
     BadRequest(String),
+    Conflict(String),
     Internal,
 }
 
@@ -14,6 +15,7 @@ impl IntoResponse for AppError {
         let (status, message) = match self {
             AppError::NotFound => (StatusCode::NOT_FOUND, "not found".to_string()),
             AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, msg),
+            AppError::Conflict(msg) => (StatusCode::CONFLICT, msg),
             AppError::Internal => {
                 error!("internal server error");
                 (StatusCode::INTERNAL_SERVER_ERROR, "internal error".to_string())
