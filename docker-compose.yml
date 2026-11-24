@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:16
-    container_name: my-backend-db
+    container_name: backend-db
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
