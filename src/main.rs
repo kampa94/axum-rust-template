@@ -1,8 +1,8 @@
 use backend::{
     config::Config,
-    repository::user_repository::UserRepository,
+    repository::{post_repository::PostRepository, user_repository::UserRepository},
     routes,
-    services::user_service::UserService,
+    services::{post_service::PostService, user_service::UserService},
     state::AppState,
 };
 use sqlx::postgres::PgPoolOptions;
@@ -25,8 +25,9 @@ async fn main() {
         .await
         .expect("migrazioni fallite");
 
-    let user_service = UserService::new(UserRepository::new(pool));
-    let state = AppState::new(config, user_service);
+    let user_service = UserService::new(UserRepository::new(pool.clone()));
+    let post_service = PostService::new(PostRepository::new(pool));
+    let state = AppState::new(config, user_service, post_service);
 
     let app = routes::router(state);
 
