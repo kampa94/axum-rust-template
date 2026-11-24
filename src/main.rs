@@ -14,7 +14,7 @@ async fn main() {
     fmt().with_env_filter(EnvFilter::from_default_env()).init();
 
     let config = Config::from_env();
-    let addr = SocketAddr::from(([0, 0, 0, 0], config.port));
+    let addr = SocketAddr::from((config.address, config.port));
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect(&config.database_url)
